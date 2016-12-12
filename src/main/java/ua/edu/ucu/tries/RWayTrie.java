@@ -1,22 +1,75 @@
 package main.java.ua.edu.ucu.tries;
 
-public class RWayTrie<T> implements Trie {
-    private final int R;
+import main.java.ua.edu.ucu.collections.structures.Queue;
+import main.java.ua.edu.ucu.collections.structures.Stack;
+
+import java.util.Iterator;
+
+public class RWayTrie implements Trie {
+    private final int R = 257;
     private Node root;
 
-    public RWayTrie(int rway) {
-        R = rway;
-        root = new Node(rway);
+    //
+    //----------------------------- private nested class Node  ----------------------------
+    // contains data, instances(pointers) of(to) next nodes, node-adding methods
+    //
+    private class Node {
+        private char c;
+        private Object value;
+        private int childNumber;
+        private Node[] next;
+
+        Node(char c, int R){
+            this.c = c;
+            next = new Node[R];
+        }
+        Node(int R) {
+            next = new Node[R];
+        }
+
+        public Node getNext(char i){
+            return next[i];
+        }
+
+        public void setNext(char c, Node node){
+            next[c] = node;
+            childNumber++;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+        @Override
+        public String toString(){return ""+c;}
+
+        public void decreaseChildNumber() {
+            childNumber--;
+        }
+
+        public int getChildNumber() {
+            return childNumber;
+        }
+    }
+    //
+    //----------------------------- End of Node  -----------------------------
+    //
+
+    public RWayTrie(){
+        root = new Node(R);
     }
 
     @Override
     public void add(Tuple t) {
         Node node = root;
 
-        if (node == null) {
-            node = new Node(t.term.charAt(0), R);
-        }
-        for (int i = 1; i < t.term.length(); i++) {
+//        if (node == null) {
+//            node = new Node(t.term.charAt(0), R);
+//        }
+        for (int i = 0; i < t.term.length(); i++) {
             Node temp = node.getNext(t.term.charAt(i));
             if (temp == null) {
                 temp = new Node(t.term.charAt(i), R);
@@ -43,57 +96,150 @@ public class RWayTrie<T> implements Trie {
 
     @Override
     public boolean contains(String word) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int i = 0;
+        Node node = root;
+        while (node.getNext(word.charAt(i)) != null) {
+            node = node.getNext(word.charAt(i));
+            i++;
+        }
+        return  i == word.length() - 1 && node.getValue() != null;
     }
 
     @Override
     public boolean delete(String word) {
-        boolean r = deleteHelper(root.getNext(word.charAt(0)), word, 0);
-        if(r){
-            root.getNext(word.charAt(0)).decreaseChildNumber();
-            if(root.getNext(word.charAt(0)).getChildNumber() == 0){
-                root.setNext(word.charAt(0), null);
-                return true;
-            }
+        int i = 0;
+        Node node = root;
+        Stack stack = new Stack();
+        stack.push(root);
+        while (node.getNext(word.charAt(i)) != null) {
+            node = node.getNext(word.charAt(i));
+            stack.push(node);
+            i++;
         }
+        if (i == word.length()-1 && node.getChildNumber() == 0) {
+            do{
+                node = (Node)stack.pop();
+                node.setNext(word.charAt(i), null);
+                node.decreaseChildNumber();
+                i--;
+            }while (i > -1 && node.getChildNumber() == 0);
+            return  true;
+        }
+
+
+//        boolean r = deleteHelper(root.getNext(word.charAt(0)), word, 0);
+//        if (r) {
+//            root.getNext(word.charAt(0)).decreaseChildNumber();
+//            if (root.getNext(word.charAt(0)).getChildNumber() == 0) {
+//                root.setNext(word.charAt(0), null);
+//                return true;
+//            }
+//        }
         return false;
     }
 
-    private boolean deleteHelper(Node node, String s, int i) {
-        if (i < s.length() && node == null) {
-            return false;
-        } else if (i == s.length() - 1) {
-            if (node.getChildNumber() == 0) {
-                return true;
-            }
-            return false;
-        } else {
-            boolean t = deleteHelper(node.getNext(s.charAt(i + 1)), s, i + 1);
+//    private boolean deleteHelper(Node node, String s, int i) {
+//        if (i < s.length() && node == null) {
+//            return false;
+//        } else if (i == s.length() - 1) {
+//            if (node.getChildNumber() == 0) {
+//                return true;
+//            }
+//            return false;
+//        } else {
+//            boolean t = deleteHelper(node.getNext(s.charAt(i + 1)), s, i + 1);
+//
+//            if (t) {
+//                node.getNext(s.charAt(i + 1)).decreaseChildNumber();
+//                if (node.getNext(s.charAt(i + 1)).getChildNumber() == 0) {
+//                    node.setNext(s.charAt(i + 1), null);
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
+//    }
+    private Queue getWordsQueue(Node baseNode){
+        Queue nodes = new Queue();
+        Queue words = new Queue();
+        Queue result = new Queue();
 
-            if(t){
-                node.getNext(s.charAt(i + 1)).decreaseChildNumber();
-                if(node.getNext(s.charAt(i + 1)).getChildNumber() == 0){
-                    node.setNext(s.charAt(i + 1), null);
-                    return true;
+        nodes.enqueue(baseNode);
+        words.enqueue(baseNode.getValue());
+
+        while(nodes.getSize() != 0){
+            int i = 0;
+            int c = 0;
+            Node node = (Node)nodes.peek();
+            while(i < R && c < node.getChildNumber()){
+                if(node.getNext((char)i) != null){
+                    nodes.enqueue(node.getNext((char)i));
+                    words.enqueue((String)words.peek() + (char)i);
+                    c++;
                 }
+                i++;
             }
-            return false;
+            if(node.getValue() != null){
+                result.enqueue(words.dequeue());
+            }
+            nodes.dequeue();
         }
-    }
 
+        return words;
+    }
     @Override
     public Iterable<String> words() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new Iterable<String>() {
+            Queue q = getWordsQueue(root);
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return q.getSize()>0;
+                    }
+
+                    @Override
+                    public String next() {
+                        return (String) q.dequeue();
+                    }
+                };
+            }
+        };
+    }
+
+    private Node getBaseNode(String s){
+        Node node = root;
+        for(char i : s.toCharArray()){
+            node = node.getNext(i);
+        }
+        return node;
     }
 
     @Override
     public Iterable<String> wordsWithPrefix(String s) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new Iterable<String>() {
+            Queue q = getWordsQueue(getBaseNode(s));
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return q.getSize()>0;
+                    }
+
+                    @Override
+                    public String next() {
+                        return (String) q.dequeue();
+                    }
+                };
+            }
+        };
     }
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getWordsQueue(root).getSize();
     }
 
 }

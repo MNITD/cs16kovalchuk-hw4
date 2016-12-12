@@ -6,8 +6,11 @@ import main.java.ua.edu.ucu.tries.RWayTrie;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
+//import java.util.regex.Matcher;
+
+//import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItems;
 
 /**
  *
@@ -31,7 +34,8 @@ public class PrefixMatchesITTest {
 
         String[] expResult = {"abc", "abce", "abcd", "abcde", "abcdef"};
 
-        assertThat(result, containsInAnyOrder(expResult));
+//        assertThat(result, containsInAnyOrder(expResult));
+        assertThat(result, hasItems(expResult));
     }
 
     @Test
@@ -43,7 +47,7 @@ public class PrefixMatchesITTest {
 
         String[] expResult = {"abc", "abce", "abcd", "abcde"};
 
-        assertThat(result, containsInAnyOrder(expResult));
+        assertThat(result, hasItems(expResult));
     }
 
 }
