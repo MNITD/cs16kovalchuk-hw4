@@ -1,16 +1,11 @@
+package ua.edu.ucu.autocomplete;
 
-package test.java.ua.edu.ucu.autocomplete;
-
-import main.java.ua.edu.ucu.autocomplete.PrefixMatches;
-import main.java.ua.edu.ucu.tries.RWayTrie;
-import org.junit.Before;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import org.junit.Test;
-
-//import java.util.regex.Matcher;
-
-//import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItems;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import ua.edu.ucu.collections.structures.Queue;
+import ua.edu.ucu.tries.RWayTrie;
 
 /**
  *
@@ -27,6 +22,31 @@ public class PrefixMatchesITTest {
     }
 
     @Test
+    public void testContains(){
+        String word = "abc";
+
+        boolean result = pm.contains(word);
+
+        boolean expResult = true;
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testDelete(){
+        String word = "abc";
+
+        pm.delete(word);
+
+        boolean result = pm.contains(word);
+
+        boolean expResult = false;
+
+        assertEquals(expResult, result);
+    }
+
+
+    @Test
     public void testWordsWithPrefix_String() {
         String pref = "ab";
 
@@ -34,8 +54,7 @@ public class PrefixMatchesITTest {
 
         String[] expResult = {"abc", "abce", "abcd", "abcde", "abcdef"};
 
-//        assertThat(result, containsInAnyOrder(expResult));
-        assertThat(result, hasItems(expResult));
+        assertThat(result, containsInAnyOrder(expResult));
     }
 
     @Test
@@ -47,7 +66,7 @@ public class PrefixMatchesITTest {
 
         String[] expResult = {"abc", "abce", "abcd", "abcde"};
 
-        assertThat(result, hasItems(expResult));
+        assertThat(result, containsInAnyOrder(expResult));
     }
 
 }

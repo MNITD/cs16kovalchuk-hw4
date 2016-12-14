@@ -1,6 +1,6 @@
-package main.java.ua.edu.ucu.collections.structures;
+package ua.edu.ucu.collections.structures;
 
-import main.java.ua.edu.ucu.collections.immutable.ImmutableLinkedList;
+import ua.edu.ucu.collections.immutable.ImmutableLinkedList;
 
 public class Queue {
     private ImmutableLinkedList immutableLinkedList;

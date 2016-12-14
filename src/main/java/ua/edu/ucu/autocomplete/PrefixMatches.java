@@ -1,7 +1,8 @@
-package main.java.ua.edu.ucu.autocomplete;
+package ua.edu.ucu.autocomplete;
 
-import main.java.ua.edu.ucu.tries.Trie;
-import main.java.ua.edu.ucu.tries.Tuple;
+import ua.edu.ucu.collections.structures.Queue;
+import ua.edu.ucu.tries.Trie;
+import ua.edu.ucu.tries.Tuple;
 
 import java.util.Iterator;
 
@@ -54,7 +55,7 @@ public class PrefixMatches {
                     public boolean hasNext() {
                         while(iterator.hasNext()){
                             word = (String)iterator.next();
-                            if(word.length()< pref.length()+k-1){
+                            if(word.length()< pref.length()+k){
                                 return true;
                             }
                         }
@@ -73,4 +74,5 @@ public class PrefixMatches {
     public int size() {
         return trie.size();
     }
+
 }

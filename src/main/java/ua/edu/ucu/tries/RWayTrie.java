@@ -1,7 +1,7 @@
-package main.java.ua.edu.ucu.tries;
+package ua.edu.ucu.tries;
 
-import main.java.ua.edu.ucu.collections.structures.Queue;
-import main.java.ua.edu.ucu.collections.structures.Stack;
+import ua.edu.ucu.collections.structures.Queue;
+import ua.edu.ucu.collections.structures.Stack;
 
 import java.util.Iterator;
 
@@ -98,11 +98,11 @@ public class RWayTrie implements Trie {
     public boolean contains(String word) {
         int i = 0;
         Node node = root;
-        while (node.getNext(word.charAt(i)) != null) {
+        while (i < word.length() && node.getNext(word.charAt(i)) != null) {
             node = node.getNext(word.charAt(i));
             i++;
         }
-        return  i == word.length() - 1 && node.getValue() != null;
+        return  i == word.length() && node.getValue() != null;
     }
 
     @Override
@@ -111,15 +111,16 @@ public class RWayTrie implements Trie {
         Node node = root;
         Stack stack = new Stack();
         stack.push(root);
-        while (node.getNext(word.charAt(i)) != null) {
+        while (i < word.length() && node.getNext(word.charAt(i)) != null) {
             node = node.getNext(word.charAt(i));
             stack.push(node);
             i++;
         }
-        if (i == word.length()-1 && node.getChildNumber() == 0) {
+        node.setValue(null);
+        if (i == word.length() && node.getChildNumber() == 0) {
             do{
                 node = (Node)stack.pop();
-                node.setNext(word.charAt(i), null);
+                node.setNext(word.charAt(i-1), null);
                 node.decreaseChildNumber();
                 i--;
             }while (i > -1 && node.getChildNumber() == 0);
@@ -159,13 +160,13 @@ public class RWayTrie implements Trie {
 //            return false;
 //        }
 //    }
-    private Queue getWordsQueue(Node baseNode){
+    private Queue getWordsQueue(Node baseNode, String baseWord){
         Queue nodes = new Queue();
         Queue words = new Queue();
         Queue result = new Queue();
 
         nodes.enqueue(baseNode);
-        words.enqueue(baseNode.getValue());
+        words.enqueue(baseWord);
 
         while(nodes.getSize() != 0){
             int i = 0;
@@ -180,17 +181,19 @@ public class RWayTrie implements Trie {
                 i++;
             }
             if(node.getValue() != null){
-                result.enqueue(words.dequeue());
+                result.enqueue(words.peek());
             }
+            words.dequeue();
+
             nodes.dequeue();
         }
 
-        return words;
+        return result;
     }
     @Override
     public Iterable<String> words() {
         return new Iterable<String>() {
-            Queue q = getWordsQueue(root);
+            Queue q = getWordsQueue(root, "");
             @Override
             public Iterator<String> iterator() {
                 return new Iterator<String>() {
@@ -219,7 +222,7 @@ public class RWayTrie implements Trie {
     @Override
     public Iterable<String> wordsWithPrefix(String s) {
         return new Iterable<String>() {
-            Queue q = getWordsQueue(getBaseNode(s));
+            Queue q = getWordsQueue(getBaseNode(s), s);
             @Override
             public Iterator<String> iterator() {
                 return new Iterator<String>() {
@@ -239,7 +242,7 @@ public class RWayTrie implements Trie {
 
     @Override
     public int size() {
-        return getWordsQueue(root).getSize();
+        return getWordsQueue(root, "").getSize();
     }
 
 }

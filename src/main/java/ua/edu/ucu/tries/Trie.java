@@ -1,4 +1,6 @@
-package main.java.ua.edu.ucu.tries;
+package ua.edu.ucu.tries;
+
+import ua.edu.ucu.collections.structures.Queue;
 
 public interface Trie {
 
