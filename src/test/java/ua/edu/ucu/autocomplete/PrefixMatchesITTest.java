@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import ua.edu.ucu.collections.structures.Queue;
 import ua.edu.ucu.tries.RWayTrie;
 
 /**
@@ -41,6 +40,16 @@ public class PrefixMatchesITTest {
         boolean result = pm.contains(word);
 
         boolean expResult = false;
+
+        assertEquals(expResult, result);
+    }
+
+
+    @Test
+    public void testSize(){
+        int result = pm.size();
+
+        int expResult = 5;
 
         assertEquals(expResult, result);
     }
